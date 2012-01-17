@@ -23,10 +23,10 @@ class RGraphs(object):
 
 	def graph(self, doc, aggBy, generate):
 		robjects.r("library(RCurl)")
-		if doc == '':
-			df = robjects.r("read.csv(textConnection(getURL('https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AqkhmY48RtzudFBxUjR3NHVQdUZyQjFkODRyWV9wNGc&output=csv')))")
-		else: 
-			df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
+		doc = doc or 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AqkhmY48RtzudFBxUjR3NHVQdUZyQjFkODRyWV9wNGc&output=csv'
+		df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
+		#df = robjects.r("read.csv('tmpfile')")
+		print doc
 		if aggBy in robjects.r['names'](df):
 			graphlist = self.graphs(df, aggBy, generate=="True")
 		else:
@@ -49,7 +49,7 @@ class RGraphs(object):
 			robjects.r['setwd'](old_d)
 		else:
 			filenames = robjects.r['oneplot'](l, generate=False)
-		return map(lambda s:'<a href="static/' + s + '"><img height="100" width="400" src="static/' + s + '" / ></a>' + s + '<br/>', filenames)
+		return map(lambda s:'<a href="static/' + s + '"><img src="static/' + s + '" / ></a>' + s + '<br/>', filenames)
 
 cherrypy.quickstart(RGraphs(), config=os.path.join(os.getcwd(), 'prod.conf'))
 

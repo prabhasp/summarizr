@@ -1,6 +1,3 @@
-library(gridExtra)
-library(ggplot2)
-library(plyr)
 source("~/Code/R/utils.R")
 
 ########### PLOT UTILS ############
@@ -20,10 +17,11 @@ noplot <- function(name_plot_prefix, filename_prefix='', suffix='') {
 oneplot <- function(name_plot_prefix_list_list, fname='output', filetype='svg', generate=TRUE) {
 	filenamestubs <- names(name_plot_prefix_list_list)
 	if (is.null(filenamestubs)) #unnamed list
-		filenames <- c(1:length(name_plot_prefix_list_list))
+		filenamestubs <- c(1:length(name_plot_prefix_list_list))
 	file_fn = if(filetype=='svg') {svg} else {pdf}
 	if (generate) {
-	    l_ply(filenames, function(fname) {
+	    library(gridExtra)
+	    lapply(filenamestubs, function(fname) {
 	        plots_only = lapply(name_plot_prefix_list_list[[fname]], function(x) {x$plot})
 		fname = paste(fname, filetype, sep='.') # prefix.svg / prefix.pdf
 		file_fn(fname, height=(2*length(plots_only)))
@@ -32,16 +30,15 @@ oneplot <- function(name_plot_prefix_list_list, fname='output', filetype='svg', 
 	     })
 	}
 	#todo: do this and earlier op together
-	unlist(lapply(filenames, function(fname) paste(fname, filetype, sep='.')))
+	unlist(lapply(filenamestubs, function(fname) paste(fname, filetype, sep='.')))
 }
-	
-	
 	
 
 ############# CORE STUFF -- just use this with plot utils ##################
 # take a one-column data frame, and plot it
 # returns NA if doesn't know how to plot, (name, plot) if it does
 ggraph_one <- function (one_column_df, prefix='') {
+	library(ggplot2)
 	col_type <- class(one_column_df[[1]])
 	if(col_type=="integer") {
 		list(name = names(one_column_df)[[1]],
@@ -59,9 +56,9 @@ ggraph_one <- function (one_column_df, prefix='') {
 ggraphs <- function(df, prefix='') {
 	df <- sanify_data_frame(df)	
 	temp_list <- lapply(names(df), function(colname) { ggraph_one(df[colname], prefix=prefix)	})
-	temp_list <- list(temp_list[which(!is.na(temp_list))])
-	names(temp_list <- lapply(temp_list, function(x) {x$name}))
-	temp_list
+	temp_list <- temp_list[which(!is.na(temp_list))]
+	names(temp_list) <- lapply(temp_list, function(x) {x$name})
+	list(temp_list)
 }
 ggraphs_fname <- function(csvname, prefix='') { ggraphs(read.csv(csvname), prefix=prefix) }
 # apply graph to a dataframe, and aggreagate by factor_names
