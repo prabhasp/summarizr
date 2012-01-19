@@ -1,6 +1,7 @@
 import cherrypy
 import rpy2.robjects as robjects
 import json, os
+robjects.r['source']('summarizr.R')
 
 class RGraphs(object):
 
@@ -22,7 +23,6 @@ class RGraphs(object):
 	index.exposed = True
 
 	def graph(self, doc, aggBy, generate):
-		robjects.r("library(RCurl)")
 		doc = doc or 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AqkhmY48RtzudFBxUjR3NHVQdUZyQjFkODRyWV9wNGc&output=csv'
 		df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
 		#df = robjects.r("read.csv('tmpfile')")
@@ -36,7 +36,6 @@ class RGraphs(object):
 
 	def graphs(self, df, aggBy=None, generate=False):
 		#generate = True
-		robjects.r['source']('summarizr.R')
 		l = []
 		if aggBy:
 			l = robjects.r['ggraphs_with_agg'](df, aggBy)
@@ -49,6 +48,7 @@ class RGraphs(object):
 			robjects.r['setwd'](old_d)
 		else:
 			filenames = robjects.r['oneplot'](l, generate=False)
+		#return filenames
 		return map(lambda s:'<a href="static/' + s + '"><img src="static/' + s + '" / ></a>' + s + '<br/>', filenames)
 
 cherrypy.quickstart(RGraphs(), config=os.path.join(os.getcwd(), 'prod.conf'))

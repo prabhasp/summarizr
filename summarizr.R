@@ -1,4 +1,7 @@
 source("~/Code/R/utils.R")
+library(gridExtra)
+library(ggplot2)
+library(RCurl) # keep this loaded, this is used by a python object using this code
 
 ########### PLOT UTILS ############
 # Tested filetypes, so far, are pdf and svg
@@ -20,7 +23,6 @@ oneplot <- function(name_plot_prefix_list_list, fname='output', filetype='svg', 
 		filenamestubs <- c(1:length(name_plot_prefix_list_list))
 	file_fn = if(filetype=='svg') {svg} else {pdf}
 	if (generate) {
-	    library(gridExtra)
 	    lapply(filenamestubs, function(fname) {
 	        plots_only = lapply(name_plot_prefix_list_list[[fname]], function(x) {x$plot})
 		fname = paste(fname, filetype, sep='.') # prefix.svg / prefix.pdf
@@ -38,7 +40,6 @@ oneplot <- function(name_plot_prefix_list_list, fname='output', filetype='svg', 
 # take a one-column data frame, and plot it
 # returns NA if doesn't know how to plot, (name, plot) if it does
 ggraph_one <- function (one_column_df, prefix='') {
-	library(ggplot2)
 	col_type <- class(one_column_df[[1]])
 	if(col_type=="integer") {
 		list(name = names(one_column_df)[[1]],
