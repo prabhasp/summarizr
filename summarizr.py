@@ -3,6 +3,10 @@ import rpy2.robjects as robjects
 import json, os
 robjects.r['source']('summarizr.R')
 
+from jinja2 import Environment, FileSystemLoader
+env = Environment(loader=FileSystemLoader('templates'))
+
+
 class RGraphs(object):
 
 	def index(self):
@@ -23,16 +27,19 @@ class RGraphs(object):
 	index.exposed = True
 
 	def graph(self, doc, aggBy, generate):
-		doc = doc or 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AqkhmY48RtzudFBxUjR3NHVQdUZyQjFkODRyWV9wNGc&output=csv'
-		df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
-		#df = robjects.r("read.csv('tmpfile')")
-		print doc
+		if doc=="":
+			df = robjects.r("read.csv('tmpfile')")
+		else:
+			df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
 		if aggBy in robjects.r['names'](df):
 			graphlist = self.graphs(df, aggBy, generate=="True")
 		else:
 			graphlist = self.graphs(df, None, generate=="True")
-		return "<html><body><ul><li>" + "</li><li>".join(graphlist) + "</li></ul></body></html>"
-	graph.exposed = True
+		template = env.get_template("graph.html")
+		rawlist = map(lambda s:s.split('.')[0], graphlist)
+		return template.render(graphlist=rawlist, ext='svg')
+
+        graph.exposed = True
 
 	def graphs(self, df, aggBy=None, generate=False):
 		#generate = True
@@ -48,8 +55,8 @@ class RGraphs(object):
 			robjects.r['setwd'](old_d)
 		else:
 			filenames = robjects.r['oneplot'](l, generate=False)
-		#return filenames
-		return map(lambda s:'<a href="static/' + s + '"><img src="static/' + s + '" / ></a>' + s + '<br/>', filenames)
+		return filenames
+		#return map(lambda s:'<a href="static/' + s + '"><img src="static/' + s + '" / ></a>' + s + '<br/>', filenames)
 
 cherrypy.quickstart(RGraphs(), config=os.path.join(os.getcwd(), 'prod.conf'))
 

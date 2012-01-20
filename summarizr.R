@@ -43,7 +43,7 @@ ggraph_one <- function (one_column_df, prefix='') {
 	col_type <- class(one_column_df[[1]])
 	if(col_type=="integer") {
 		list(name = names(one_column_df)[[1]],
-			 plot = ggplot(data=one_column_df) + aes_string(x=names(one_column_df)[1]) + geom_histogram(),
+			 plot = ggplot(data=one_column_df) + aes_string(x=names(one_column_df)[1]) + geom_histogram() + opts(axis.title.y=theme_blank()),
 			 prefix = prefix)
 	} else if(col_type=="factor") {
 		list(name = names(one_column_df)[[1]],

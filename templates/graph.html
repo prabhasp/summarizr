@@ -1,0 +1,26 @@
+<html>
+	<head>
+	<link rel="stylesheet" href="static/tabs.css" type="text/css" media="screen" />
+	<script src="static/jquery-1.7.1.min.js"></script>
+	<script src="static/tabs.js"></script>
+	</head>
+<body>
+	<div id="tabs_container">
+	  <ul id="tabs">
+	  {% for graph in graphlist %}
+	    <li {% if loop.first %} class="active" {% endif %}>
+              <a href="#{{ graph }}"> {{graph}} </a>
+            </li>
+          {% endfor %}
+	  </ul>
+	</div>
+	<div id="tabs_content_container">
+	  {% for graph in graphlist %}
+	  <div id="{{ graph }}" class="tab_content" {% if loop.first %} style="display: block;" {% endif %}>
+	    <a href="static/{{ graph }}.{{ ext }}"><embed src="static/{{ graph }}.{{ ext }}"></img></a>
+	  </div>
+	  {% endfor %}
+	</div>
+</body>
+</html>
+
