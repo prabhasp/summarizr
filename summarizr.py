@@ -26,23 +26,22 @@ class RGraphs(object):
         """
 	index.exposed = True
 
-	def graph(self, doc, aggBy, generate):
+	def graph(self, doc="", aggBy="", generate="False"):
 		if doc=="":
-			df = robjects.r("read.csv('tmpfile')")
+			df = robjects.r("read.csv('static/tmpfile')")
 		else:
 			df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
-		if aggBy in robjects.r['names'](df):
-			graphlist = self.graphs(df, aggBy, generate=="True")
-		else:
-			graphlist = self.graphs(df, None, generate=="True")
+		factorNames = robjects.r['names'](df)
+		colNames = robjects.r['factor_col_names'](df)
+		if aggBy in colNames:  graphlist = self.graphs(df, aggBy, generate=="True")
+		else: graphlist = self.graphs(df, None, generate=="True")
 		template = env.get_template("graph.html")
 		rawlist = map(lambda s:s.split('.')[0], graphlist)
-		return template.render(graphlist=rawlist, ext='svg')
+		return template.render(graphlist=rawlist, colNames=colNames, ext='svg')
 
         graph.exposed = True
 
 	def graphs(self, df, aggBy=None, generate=False):
-		#generate = True
 		l = []
 		if aggBy:
 			l = robjects.r['ggraphs_with_agg'](df, aggBy)
@@ -56,7 +55,6 @@ class RGraphs(object):
 		else:
 			filenames = robjects.r['oneplot'](l, generate=False)
 		return filenames
-		#return map(lambda s:'<a href="static/' + s + '"><img src="static/' + s + '" / ></a>' + s + '<br/>', filenames)
 
 cherrypy.quickstart(RGraphs(), config=os.path.join(os.getcwd(), 'prod.conf'))
 

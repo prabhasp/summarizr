@@ -5,6 +5,13 @@
 	<script src="static/tabs.js"></script>
 	</head>
 <body>
+	<div id="header">
+          <select class="right" name=select1>
+	  {% for colname in colNames %}
+	   <option> <a href="#">{{ colname }}</a> </option>
+	  {% endfor %}
+	  </select>
+	</div>
 	<div id="tabs_container">
 	  <ul id="tabs">
 	  {% for graph in graphlist %}

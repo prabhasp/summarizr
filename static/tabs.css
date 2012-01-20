@@ -60,3 +60,6 @@
 .tab_content {
     display: none;
 }
+.right {
+    float:right;
+}
