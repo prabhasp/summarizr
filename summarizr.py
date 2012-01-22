@@ -28,7 +28,7 @@ class RGraphs(object):
 
 	def graph(self, doc="", aggBy="", generate="False"):
 		if doc=="":
-			df = robjects.r("read.csv('static/tmpfile')")
+			df = robjects.r("read.csv('static/example.csv')")
 		else:
 			df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
 		factorNames = robjects.r['names'](df)
