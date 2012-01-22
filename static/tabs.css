@@ -1,5 +1,5 @@
 #tabs_wrapper {
-    width: 422px;
+    width: 600px;
 }
 #tabs_container {
     border-bottom: 1px solid #ccc;
@@ -55,7 +55,7 @@
     border: 1px solid #ccc;
     border-top: none;
     padding: 10px;
-    width: 400px;
+    width: 700px;
 }
 .tab_content {
     display: none;

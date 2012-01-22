@@ -1,0 +1,9 @@
+*.pdf
+*.svg
+.*.swp
+*/.*.swp
+static/*.pdf
+static/*.svg
+static/build
+*.R*
+.DS_Store
