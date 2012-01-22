@@ -10,41 +10,28 @@ env = Environment(loader=FileSystemLoader('templates'))
 class RGraphs(object):
 
 	def index(self):
-		return """
-        <html><body>
-            <h2>Upload a file</h2>
-            <form action="graph" method="post" enctype="multipart/form-data">
-	    Enter a google docs csv export url:
-		<input type="string" name="doc" /> <br/>
-	    Enter aggregation column name:
-		<input type="string" name="aggBy" /> <br/>
-		<input type="radio" name="generate" value="False" checked /> Just display images. 
-		<input type="radio" name="generate" value="True" /> Generate new images (takes a while). <br />
-            <input type="submit" />
-            </form>
-        </body></html>
-        """
+		return env.get_template('index.html').render()
 	index.exposed = True
 
-	def graph(self, doc="", aggBy="", generate="False"):
+	def graph(self, doc="", splitBy="", generate="False", template="graph.html"):
 		if doc=="":
 			df = robjects.r("read.csv('static/example.csv')")
 		else:
 			df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
 		factorNames = robjects.r['names'](df)
 		colNames = robjects.r['factor_col_names'](df)
-		if aggBy in colNames:  graphlist = self.graphs(df, aggBy, generate=="True")
+		if splitBy in colNames:  graphlist = self.graphs(df, splitBy, generate=="True")
 		else: graphlist = self.graphs(df, None, generate=="True")
-		template = env.get_template("graph.html")
 		rawlist = map(lambda s:s.split('.')[0], graphlist)
+		template = env.get_template(template)
 		return template.render(graphlist=rawlist, colNames=colNames, ext='svg')
-
         graph.exposed = True
+	
 
-	def graphs(self, df, aggBy=None, generate=False):
+	def graphs(self, df, splitBy=None, generate=False):
 		l = []
-		if aggBy:
-			l = robjects.r['ggraphs_with_agg'](df, aggBy)
+		if splitBy:
+			l = robjects.r['ggraphs_with_agg'](df, splitBy)
 		else:
 			l = robjects.r['ggraphs'](df)
 		if generate:

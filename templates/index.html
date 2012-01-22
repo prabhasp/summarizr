@@ -1,0 +1,12 @@
+        <html><body>
+            <h2>Upload a file</h2>
+            <form action="graph" method="post" enctype="multipart/form-data">
+	    Enter a google docs csv export url:
+		<input type="string" name="doc" /> <br/>
+	    Enter aggregation column name:
+		<input type="string" name="splitBy" /> <br/>
+		<input type="radio" name="generate" value="False" checked /> Just display images. 
+		<input type="radio" name="generate" value="True" /> Generate new images (takes a while). <br />
+            <input type="submit" />
+            </form>
+        </body></html>

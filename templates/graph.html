@@ -2,16 +2,19 @@
 	<head>
 	<link rel="stylesheet" href="static/tabs.css" type="text/css" media="screen" />
 	<script src="static/jquery-1.7.1.min.js"></script>
+	<script src="static/jquery.ba-bbq.min.js"></script>
 	<script src="static/tabs.js"></script>
 	</head>
 <body>
 	<div id="header">
-          <select class="right" name=select1>
+          <select id="split_by_switcher" class="right" name=select1>
+	  <option> <a href="#"></a> </option>
 	  {% for colname in colNames %}
 	   <option> <a href="#">{{ colname }}</a> </option>
 	  {% endfor %}
 	  </select>
 	</div>
+	<div id="the_tabs">
 	<div id="tabs_container">
 	  <ul id="tabs">
 	  {% for graph in graphlist %}
@@ -27,6 +30,7 @@
 	    <a href="static/{{ graph }}.{{ ext }}"><embed src="static/{{ graph }}.{{ ext }}"></img></a>
 	  </div>
 	  {% endfor %}
+	</div>
 	</div>
 </body>
 </html>
