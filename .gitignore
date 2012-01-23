@@ -6,5 +6,6 @@
 static/*.pdf
 static/*.svg
 static/build
-*.R*
+*.RData
+*.Rhistory
 .DS_Store

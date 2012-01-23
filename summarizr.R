@@ -1,4 +1,4 @@
-source("~/Code/R/utils.R")
+source("utils.R")
 library(gridExtra)
 library(ggplot2)
 library(RCurl) # keep this loaded, this is used by a python object using this code
