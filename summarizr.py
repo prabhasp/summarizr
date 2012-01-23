@@ -13,11 +13,11 @@ class RGraphs(object):
 		return env.get_template('index.html').render()
 	index.exposed = True
 
-	def graph(self, doc="", splitBy="", generate="False", template="graph.html"):
-		if doc=="":
-			df = robjects.r("read.csv('static/example.csv')")
-		else:
-			df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
+	def graph(self, doc="", splitBy="", generate="False", whole='Yes'):
+		if whole=='Yes': template = 'graph.html'
+		else: template = 'tabs.html'
+		if doc=="": df = robjects.r("read.csv('static/example.csv')")
+		else: df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
 		factorNames = robjects.r['names'](df)
 		colNames = robjects.r['factor_col_names'](df)
 		if splitBy in colNames:  graphlist = self.graphs(df, splitBy, generate=="True")
