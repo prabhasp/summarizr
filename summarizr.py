@@ -27,14 +27,21 @@ class RGraphs(object):
 		return template.render(graphlist=rawlist, colNames=colNames, ext='svg')
         graph.exposed = True
 	
-
 	def graphs(self, df, splitBy=None, generate=False):
-		l = []
-		if splitBy:
-			l = robjects.r['ggraphs_with_agg'](df, splitBy)
-		else:
-			l = robjects.r['ggraphs'](df)
+		if splitBy: l = robjects.r['ggraphs_with_agg'](df, splitBy)
+		else: l = robjects.r['ggraphs'](df)
+		
+		# even if generate is false, if the generated image doesn't exist,
+		# we wanna put it there.
+		# TODO: put some end_time based logic here, or in R
+		filenames = robjects.r['oneplot'](l, generate=False)
+		file_exists = map(lambda x: os.path.exists(os.path.join('static',x)), filenames)
+		if not reduce(lambda a,b: b and a, file_exists, True): 
+			generate = True
+		print ' '.join([str(f) for f in file_exists])
+
 		if generate:
+			print 'generating: ' + ' '.join(filenames)
 			old_d = robjects.r('getwd()')
 			robjects.r('setwd("' + os.path.join(os.getcwd(), "static") + '")')
 			filenames = robjects.r['oneplot'](l) 
