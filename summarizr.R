@@ -5,18 +5,6 @@ library(RCurl) # keep this loaded, this is used by a python object using this co
 
 ########### PLOT UTILS ############
 # Tested filetypes, so far, are pdf and svg
-vecplot <- function(name_plot_prefix, filetype='svg') {
-    name = name_plot_prefix[[1]]
-    plot = name_plot_prefix[[2]]
-    prefix = name_plot_prefix[[3]]
-    fname = paste(prefix, name, filetype, sep='.')
-    ggsave(fname, plot=plot, height=2)
-    fname
-}
-noplot <- function(name_plot_prefix, filename_prefix='', suffix='') {
-    paste(name_plot_prefix[[3]], name_plot_prefix[[1]], suffix, sep='.')
-}
-
 oneplot <- function(name_plot_prefix_list_list, fname='output', filetype='svg', generate=TRUE) {
     prefix = paste(names(name_plot_prefix_list_list), '_')
     if(is.null(prefix)) { prefix = ''}
@@ -57,6 +45,7 @@ ggraph_one <- function (one_column_df, prefix='') {
         NA
     }
 }
+
 # apply ggraph_one to a dataframe of many columns after sanification; drop NAs before returning; finally, return a one-element list
 # (the one-element list is necessary so that ggplot objects aren't immediately evaluated / drawn)
 ggraphs <- function(df, prefix='', listname='') {
@@ -68,7 +57,7 @@ ggraphs <- function(df, prefix='', listname='') {
     
     setNames(list(temp_list), listname)
 }
-ggraphs_fname <- function(csvname, prefix='') { ggraphs(read.csv(csvname), prefix=prefix) }
+
 # apply graph to a dataframe, and aggreagate by factor_names
 ggraphs_with_agg <- function(df, factor_names) {
     list_of_split_dfs = dlply(df, factor_names, function(x) {x[,!(names(x) %in% factor_names)]})
@@ -76,8 +65,4 @@ ggraphs_with_agg <- function(df, factor_names) {
         unlist(ggraphs(list_of_split_dfs[[name]], prefix=name), recursive=FALSE)
     })
     setNames(res_list, names(list_of_split_dfs))
-}
-# same, except now this takes a filename rather than a dataframe
-ggraphs_with_agg_fname <- function(csvname, factor_names) {
-    ggraph_with_agg(read.csv(csvname), factor_names)
 }
