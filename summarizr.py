@@ -13,46 +13,49 @@ class RGraphs(object):
         return env.get_template('index.html').render()
     index.exposed = True
 
+
     def graph(self, doc="", splitBy="", generate="False", whole='Yes'):
-        if whole=='Yes': template = 'graph.html'
-        else: template = 'tabs.html'
-        if doc=="":
-            doc = 'example'
-            df = robjects.r("read.csv('static/example.csv')")
+        # given a document name, give back a data frame
+        if doc=='': doc = 'static/example.csv'
+        if 'http://' in doc or 'https://' in doc:
+            df =  robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
         else: 
-            df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
-        factorNames = robjects.r['names'](df)
-        colNames = robjects.r['factor_col_names'](df)
-        if splitBy in colNames:  graphlist = self.graphs(df, doc, splitBy, generate=="True")
-        else: graphlist = self.graphs(df, doc, None, generate=="True")
-        rawlist = map(lambda s:s.split('.')[0], graphlist)
+            df = robjects.r("read.csv('" + doc + "')")
+
+        colNames = robjects.r['splittable_col_names'](df)
+        if splitBy not in colNames: splitBy = None
+
+        sanitized_doc_name = filter(str.isalnum, doc)
+        graph_filenames = self.graphs(df, sanitized_doc_name, splitBy, generate=(generate=="True"))
+        graph_filenamestubs = map(lambda s:s.split('.')[0], graph_filenames)
+
+        template = 'graph.html' if whole=='Yes' else 'tabs.html'
         template = env.get_template(template)
-        return template.render(graphlist=rawlist, colNames=colNames, ext='svg')
+
+        return template.render(graph_filenamestubs=graph_filenamestubs, colNames=colNames, ext='svg')
     graph.exposed = True
     
-    def graphs(self, df, name, splitBy=None, generate=False):
-        name = filter(str.isalnum, name) #sanitize the name into alphanum
+    def graphs(self, df, dataname, splitBy=None, generate=False):
         if splitBy: l = robjects.r['ggraphs_with_agg'](df, splitBy)
-        else: l = robjects.r['ggraphs'](df, listname=name)
+        else: l = robjects.r['ggraphs'](df, dfname=dataname)
         
-        # even if generate is false, if the generated image doesn't exist,
-        # we wanna put it there.
+        # Generate images if they don't exist; even if generate=False 
         # TODO: put some end_time based logic here, or in R
-        filenames = robjects.r['oneplot'](l, generate=False)
-        file_exists = map(lambda x: os.path.exists(os.path.join('static',x)), filenames)
-        if not reduce(lambda a,b: b and a, file_exists, True): 
-            generate = True
-        print ' '.join([str(f) for f in file_exists])
+        filenames = robjects.r['one_plot'](l, generate=False)
+        file_exists = map(lambda x: os.path.exists(os.path.join('static',dataname,x)), filenames)
+        if False in file_exists: generate = True
 
         if generate:
             print 'generating: ' + ' '.join(filenames)
             old_d = robjects.r('getwd()')
-            robjects.r('setwd("' + os.path.join(os.getcwd(), "static") + '")')
-            filenames = robjects.r['oneplot'](l) 
+            new_d = os.path.join(os.getcwd(), 'static', dataname)
+            if not os.path.exists(new_d): os.makedirs(new_d)
+            robjects.r('setwd("' + new_d +  '")')
+            filenames = robjects.r['one_plot'](l) 
             robjects.r['setwd'](old_d)
         else:
-            filenames = robjects.r['oneplot'](l, generate=False)
-        return filenames
+            filenames = robjects.r['one_plot'](l, generate=False)
+        return map(lambda f: os.path.join('static', dataname, f), filenames)
 
 cherrypy.quickstart(RGraphs(), config=os.path.join(os.getcwd(), 'prod.conf'))
 

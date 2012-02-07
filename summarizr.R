@@ -5,28 +5,25 @@ library(RCurl) # keep this loaded, this is used by a python object using this co
 
 ########### PLOT UTILS ############
 # Tested filetypes, so far, are pdf and svg
-oneplot <- function(name_plot_prefix_list_list, fname='output', filetype='svg', generate=TRUE) {
-    prefix = paste(names(name_plot_prefix_list_list), '_')
-    if(is.null(prefix)) { prefix = ''}
-
-    filenamestubs <- names(name_plot_prefix_list_list)
+one_plot <- function(named_plot_list, fname='output', ftype='svg', generate=TRUE) {
+    filenamestubs <- names(named_plot_list)
     if (is.null(filenamestubs)) #unnamed list
         filenamestubs <- c(1:length(name_plot_prefix_list_list))
-    file_fn = if(filetype=='svg') {svg} else {pdf}
+    file_fn = if(ftype=='svg') {svg} else {pdf}
+   
+    filenames = sapply(names(named_plot_list), function(plotname) paste(plotname, ftype, sep='.'))
     if (generate) {
-        lapply(filenamestubs, function(fname) {
-            plots_only = lapply(name_plot_prefix_list_list[[fname]], function(x) {x$plot})
-            fname = paste(prefix, fname, filetype, sep='.') # prefix.svg / prefix.pdf
-            file_fn(fname, height=(2*length(plots_only)))
-            do.call(grid.arrange, c(plots_only, ncol = 1))
+        lapply(names(named_plot_list), function(plotname) {
+            fname = filenames[[plotname]]
+            plots = named_plot_list[[plotname]]
+
+            file_fn(fname, height=(2*length(plots)))
+            do.call(grid.arrange, c(plots, ncol = 1))
             dev.off()
          })
     }
-    #todo: do this and earlier op together
-    unlist(lapply(filenamestubs, function(fname) 
-                            paste(fname, filetype, sep='.')))
+    filenames
 }
-    
 
 ############# CORE STUFF -- just use this with plot utils ##################
 # take a one-column data frame, and plot it
@@ -56,7 +53,7 @@ ggraph_one <- function (one_column_df) {
 # Returns a list of [name=plot] elements 
 ggraphs <- function(df, dfname='') {
     df <- sanify_data_frame(df)    
-    temp_list <- lapply(names(df), function(colname) { ggraph_one(df[colname]) })
+    temp_list <- unlist(llply(names(df), function(colname) { ggraph_one(df[colname]) }), recursive = FALSE)
     temp_list <- temp_list[which(!is.na(temp_list))]   #remove all the NAs
     setNames(list(temp_list), dfname)
 }
@@ -65,7 +62,7 @@ ggraphs <- function(df, dfname='') {
 ggraphs_with_agg <- function(df, factor_names) {
     list_of_split_dfs = dlply(df, factor_names, function(x) {x[,!(names(x) %in% factor_names)]})
     res_list <- lapply(names(list_of_split_dfs), function(name) {
-        unlist(ggraphs(list_of_split_dfs[[name]], prefix=name), recursive=FALSE)
+        unlist(ggraphs(list_of_split_dfs[[name]]), recursive=FALSE)
     })
     setNames(res_list, names(list_of_split_dfs))
 }

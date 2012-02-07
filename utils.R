@@ -17,8 +17,8 @@ only_plotworthy_columns <- function(df, most_levels=20) {
 	df[sapply(df, function(col) { !(is.factor(col) && (length(levels(col)) == 1)) })]
 }
 
-# returns all the column names if the column type is a factor
-factor_col_names <- function(df) {
+# returns names of all factor columns with > 1 and < a lot levels
+splittable_col_names <- function(df) {
 	names(which(sapply(only_plotworthy_columns(df), is.factor)))
 }
 
