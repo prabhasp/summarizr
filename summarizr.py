@@ -13,7 +13,6 @@ class RGraphs(object):
         return env.get_template('index.html').render()
     index.exposed = True
 
-
     def graph(self, doc="", splitBy="", generate="False", whole='Yes'):
         # given a document name, give back a data frame
         if doc=='': doc = 'static/example.csv'
@@ -32,7 +31,7 @@ class RGraphs(object):
         template = 'graph.html' if whole=='Yes' else 'tabs.html'
         template = env.get_template(template)
 
-        return template.render(graph_filenamestubs=graph_filenamestubs, colNames=colNames, ext='svg')
+        return template.render(graph_filenamestubs=graph_filenamestubs, dirname=os.path.join('static',sanitized_doc_name), colNames=colNames, ext='svg')
     graph.exposed = True
     
     def graphs(self, df, dataname, splitBy=None, generate=False):
@@ -55,7 +54,7 @@ class RGraphs(object):
             robjects.r['setwd'](old_d)
         else:
             filenames = robjects.r['one_plot'](l, generate=False)
-        return map(lambda f: os.path.join('static', dataname, f), filenames)
+        return filenames 
 
 cherrypy.quickstart(RGraphs(), config=os.path.join(os.getcwd(), 'prod.conf'))
 

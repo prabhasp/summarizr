@@ -16,7 +16,7 @@ one_plot <- function(named_plot_list, fname='output', ftype='svg', generate=TRUE
         lapply(names(named_plot_list), function(plotname) {
             fname = filenames[[plotname]]
             plots = named_plot_list[[plotname]]
-
+    
             file_fn(fname, height=(2*length(plots)))
             do.call(grid.arrange, c(plots, ncol = 1))
             dev.off()
@@ -65,4 +65,5 @@ ggraphs_with_agg <- function(df, factor_names) {
         unlist(ggraphs(list_of_split_dfs[[name]]), recursive=FALSE)
     })
     setNames(res_list, names(list_of_split_dfs))
+
 }

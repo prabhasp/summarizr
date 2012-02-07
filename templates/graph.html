@@ -27,7 +27,7 @@
 	<div id="tabs_content_container">
 	  {% for graph in graph_filenamestubs %}
 	  <div id="{{ graph }}" class="tab_content" {% if loop.first %} style="display: block;" {% endif %}>
-	    <a href="{{ graph }}.{{ ext }}"><embed src="{{ graph }}.{{ ext }}"></img></a>
+	    <a href="{{ dirname }}/{{ graph }}.{{ ext }}"><embed src="{{ dirname }}/{{ graph }}.{{ ext }}"></img></a>
 	  </div>
 	  {% endfor %}
 	</div>
