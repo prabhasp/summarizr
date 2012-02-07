@@ -30,32 +30,35 @@ oneplot <- function(name_plot_prefix_list_list, fname='output', filetype='svg', 
 
 ############# CORE STUFF -- just use this with plot utils ##################
 # take a one-column data frame, and plot it
-# returns NA if doesn't know how to plot, (name, plot) if it does
-ggraph_one <- function (one_column_df, prefix='') {
+# returns NA if doesn't know how to plot, one-element [name=plot] list if it can.
+ggraph_one <- function (one_column_df) {
     col_type <- class(one_column_df[[1]])
     if(col_type=="integer") {
-        list(name = names(one_column_df)[[1]],
-             plot = ggplot(data=one_column_df) + aes_string(x=names(one_column_df)[1]) + geom_histogram() + opts(axis.title.y=theme_blank()),
-             prefix = prefix)
+        setNames(list(ggplot(data=one_column_df) + 
+                            aes_string(x=names(one_column_df)[1]) + 
+                            geom_histogram() + 
+                            opts(axis.title.y=theme_blank())),
+                names(one_column_df)[[1]])
     } else if(col_type=="factor") {
-        list(name = names(one_column_df)[[1]],
-            plot = ggplot(data=one_column_df) + aes_string(fill=names(one_column_df)[1]) + aes(x=1) + geom_bar(position="fill") + coord_flip() + opts(legend.position="bottom", legend.direction="horizontal", axis.title.x = theme_blank(), axis.title.y=theme_blank(), axis.text.y=theme_blank(), axis.ticks=theme_blank(), panel.grid.major=theme_blank(), panel.grid.minor=theme_blank()),
-            prefix = prefix)
+        b = theme_blank()
+        setNames(list(ggplot(data=one_column_df) + 
+                        aes_string(fill=names(one_column_df)[1]) + aes(x=1) + 
+                        geom_bar(psition="fill") + coord_flip() + 
+                        opts(legend.position="bottom", legend.direction="horizontal", 
+                            axis.title.x = b, axis.title.y=b, axis.text.y=b, 
+                            axis.ticks=b, panel.grid.major=b, panel.grid.minor=b)),
+                names(one_column_df)[[1]])
     } else {
         NA
     }
 }
 
-# apply ggraph_one to a dataframe of many columns after sanification; drop NAs before returning; finally, return a one-element list
-# (the one-element list is necessary so that ggplot objects aren't immediately evaluated / drawn)
-ggraphs <- function(df, prefix='', listname='') {
-    if (listname=='') { listname = as.character(as.integer(runif(1, 10E7,10E8)))} 
+# Returns a list of [name=plot] elements 
+ggraphs <- function(df, dfname='') {
     df <- sanify_data_frame(df)    
-    temp_list <- lapply(names(df), function(colname) { ggraph_one(df[colname], prefix=prefix)    })
-    temp_list <- temp_list[which(!is.na(temp_list))]
-    names(temp_list) <- lapply(temp_list, function(x) {x$name})
-    
-    setNames(list(temp_list), listname)
+    temp_list <- lapply(names(df), function(colname) { ggraph_one(df[colname]) })
+    temp_list <- temp_list[which(!is.na(temp_list))]   #remove all the NAs
+    setNames(list(temp_list), dfname)
 }
 
 # apply graph to a dataframe, and aggreagate by factor_names
