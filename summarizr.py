@@ -36,10 +36,25 @@ class RGraphs(object):
     graph.exposed = True
 
     def bin(self, doc="", splitBy=""):
-		if doc=="": df = robjects.r("read.csv('static/example.csv')")
-		else: df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
-        return onedf(df)
+        # given a document name, give back a data frame
+        if doc=='': doc = 'static/example.csv'
+        if 'http://' in doc or 'https://' in doc:
+            df =  robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
+        else: 
+            df = robjects.r("read.csv('" + doc + "')")
+        
+        colNames = robjects.r['splittable_col_names'](df)
+        if splitBy not in colNames: 
+            s = robjects.r('onedf')(df, "default")[0]
+        else:
+            s = robjects.r('aggdf')(df,splitBy)[0]
+
+        return str(s)
     bin.exposed = True
+    
+    def sum(self):
+        return env.get_template('summary.html').render()
+    sum.exposed = True
     
     def graphs(self, df, dataname, splitBy=None, generate=False):
         if splitBy: l = robjects.r['ggraphs_with_agg'](df, splitBy)
