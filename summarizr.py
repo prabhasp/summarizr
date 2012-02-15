@@ -2,6 +2,7 @@ import cherrypy
 import rpy2.robjects as robjects
 import json, os
 robjects.r['source']('summarizr.R')
+robjects.r['source']('summarizr2.R')
 
 from jinja2 import Environment, FileSystemLoader
 env = Environment(loader=FileSystemLoader('templates'))
@@ -25,7 +26,12 @@ class RGraphs(object):
 		rawlist = map(lambda s:s.split('.')[0], graphlist)
 		template = env.get_template(template)
 		return template.render(graphlist=rawlist, colNames=colNames, ext='svg')
-        graph.exposed = True
+    graph.exposed = True
+
+    def bin(self, doc="", splitBy=""):
+		if doc=="": df = robjects.r("read.csv('static/example.csv')")
+		else: df = robjects.r("read.csv(textConnection(getURL('" + doc + "')))")
+        return onedf(df)
 	
 	def graphs(self, df, splitBy=None, generate=False):
 		if splitBy: l = robjects.r['ggraphs_with_agg'](df, splitBy)
