@@ -52,8 +52,8 @@ class RGraphs(object):
         return str(s)
     bin.exposed = True
     
-    def sum(self):
-        return env.get_template('summary.html').render()
+    def d3_summary(self):
+        return env.get_template('d3_test.html').render()
     sum.exposed = True
     
     def graphs(self, df, dataname, splitBy=None, generate=False):

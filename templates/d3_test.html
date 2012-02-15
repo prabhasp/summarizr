@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>D3 Test</title>
+        <link rel="stylesheet" href="static/tabs.css" type="text/css" media="screen" />
+        <script src="static/d3/d3.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var dataset = {default:{general_information_mother_name:{x:["Aisha", "Alice", "amina", "Blessing", "cecelia", "Confort", "Esther", "Eunice", "Fumilayo", "Hannatu", "Hauwa", "Iyabo", "Joy", "Jummai", "Justina", "Mary", "Maryam", "Nafisa", "Rashidat", "rukaiya", "Rukayya", "Sabdat", "Shade", "Tebe", "Tope", "Uloma", "Victoria"], freq:[1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, general_information_name_of_child:{x:["abdulsalam", "Abdussamiu", "Abubakar", "Aiman", "Ajuma", "Amina", "Anna", "Blessing", "Chinecherema", "David", "Deborah", "Emanuel", "fatima", "favour", "Halimat", "Jami", "John", "Josephine", "Kehinde", "Mathew", "Michael", "Muhyiddeen", "Nasiru", "Patrick", "Prince", "Ridwan", "Sumayya", "Suwaiba"], freq:[1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, general_information_age:{x:[8, 10, 11, 12, 13], freq:[2, 10, 7, 7, 3]}, general_information_sex:{x:["female", "male"], freq:[14, 15]}, out_of_school:{x:"no", freq:29}, out_of_school_reason:{x:"n/a", freq:29}, drop_out_school:{x:"n/a", freq:29}, drop_out_class_primary:{x:"n/a", freq:29}, drop_out_class_junior_secondary:{x:"n/a", freq:29}, drop_out_class_senior_secondary:{x:"n/a", freq:29}, schooling_status_type_schools:{x:"regular_formal", freq:29}, schooling_status_grades:{x:"primary", freq:29}, school_grade_primary:{x:["primary4", "primary5", "primary6"], freq:[8, 5, 16]}, school_grade_junior_secondary:{x:"n/a", freq:29}, school_grade_senior_secondary:{x:"n/a", freq:29}, literacy_note:{x:"n/a", freq:29}, learning_levels_reading_nothing:{x:["letter", "story", "word"], freq:[2, 22, 5]}, numeracy_note:{x:"n/a", freq:29}, learning_levels_numeracy_nothing:{x:["learning_levels_numeracy_division", "learning_levels_numeracy_num_recognition_10_99", "learning_levels_numeracy_subtraction"], freq:[23, 3, 3]}, X_xform_id_string:{x:"schooling_status_format_18Nov11", freq:29}, X_percentage_complete:{x:"n/a", freq:29}, X_status:{x:"n/a", freq:29}, X_id:{x:"n/a", freq:29}, X_attachments:{x:"n/a", freq:29}, X_potential_duplicates:{x:"n/a", freq:29}}};
+
+            var data = dataset.default.school_grade_primary;
+            console.log(data);
+            d3.select("body").selectAll("div")
+                .data(data.freq)
+                .enter()
+                .append("div")
+                .attr("class", "bar")
+                .style("height", function(d) { return (d * 20) + "px"});
+                           
+                            
+                
+
+        </script>
+    </body>
+</html>
