@@ -54,7 +54,7 @@ class RGraphs(object):
     
     def d3_summary(self):
         return env.get_template('d3_test.html').render()
-    sum.exposed = True
+    d3_summary.exposed = True
     
     def graphs(self, df, dataname, splitBy=None, generate=False):
         if splitBy: l = robjects.r['ggraphs_with_agg'](df, splitBy)
