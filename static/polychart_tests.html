@@ -15,13 +15,35 @@
                     var thisGraphDiv = document.createElement('div');
                     parentGraphDiv.appendChild(thisGraphDiv);
                     
-                    var data = (dataset.default[key])
+                    var data = (dataset.default[key]);
                     var datasize = _.size(data.x);
-                    if(datasize > 1 && datasize < 10) {
-                            gg.graph(dataset.default[key])
-                              .layer(gg.layer.bar().map('x','x').map('y','freq').map('color','x'))
-                              .opts({'width':'800', 'padding-right':'90', 'height':'300', 'title':key})
+                    if(datasize == 0) {
+                        thisGraphDiv.textContent = key + " : " + data.x[0] + " (" + data.freq[0] + " responses).";
+                    } else if(datasize < 10) {
+                
+                        if (typeof (data.x[0]) === "number") {
+                            /* if number make pure histogram */
+                            gg.graph(data)
+                              .layer(gg.layer.bar()
+                                       .map('x','x')
+                                       .map('y','freq')
+                                       .map('color','x'))
+                              .opts({'width':'800', 'height':'300',
+                                     'padding-right':'90', 'title':key,
+                                     'legend-postion':'bottom'})
                               .render(thisGraphDiv);
+                        } else if (typeof (data.x[0]) === "string") {
+                            /* if number make pure histogram */
+                            data.q = _.map(data.x, function(x) {return key;});
+                            gg.graph(data)
+                              .layer(gg.layer.bar().stats("stack")
+                                       .map('x','q')
+                                       .map('y','freq')
+                                       .map('color','x'))
+                              .opts({'width':'200', 'height':'400',
+                                     'padding-right':'90', 'title':key})
+                              .render(thisGraphDiv);
+                        }    
                     }
             };
         </script>
